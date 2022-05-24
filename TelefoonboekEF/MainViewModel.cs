@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -14,8 +14,9 @@ namespace Telefoonboek
         private string firstname;
         private string email;
         private string phoneNumber;
-        private ObservableCollection<PhoneBookItem> phoneBookItems = new ObservableCollection<PhoneBookItem>();
+        private List<PhoneBookItem> phoneBookItems = new List<PhoneBookItem>();
         private PhoneBookItem selectedItem;
+        private string address;
 
         public string Lastname
         {
@@ -58,6 +59,16 @@ namespace Telefoonboek
                 phoneNumber = value;
                 OnPropertyChanged();
                 CheckSaveButtonAvailablity();
+            }
+        }
+
+        public string Address
+        {
+            get { return address; }
+            set
+            {
+                address = value;
+                OnPropertyChanged();
             }
         }
 
@@ -109,12 +120,22 @@ namespace Telefoonboek
         public ICommand SaveCommand { get; set; }
         public ICommand DeleteCommand { get; set; }
 
-        public ObservableCollection<PhoneBookItem> PhoneBookItems { get => phoneBookItems; set => phoneBookItems = value; }
+        public List<PhoneBookItem> PhoneBookItems
+        {
+            get => phoneBookItems;
+            set
+            {
+                phoneBookItems = value;
+                OnPropertyChanged();
+            }
+        }
+        PhoneBookRepository phoneBookRepository = new PhoneBookRepository();
 
         public MainViewModel()
         {
             SaveCommand = new ActionCommand(SaveCommandAction);
             DeleteCommand = new ActionCommand(DeleteCommandAction);
+            PhoneBookItems = phoneBookRepository.GetAllPhoneBookItems();
         }
 
         private void FillTextBoxes(PhoneBookItem item)
@@ -129,7 +150,7 @@ namespace Telefoonboek
         {
             if (SelectedItem == null)
             {
-                PhoneBookItems.Add(new PhoneBookItem(Lastname, Firstname, Email, PhoneNumber));
+                phoneBookRepository.SaveItem(new PhoneBookItem(Lastname, Firstname, Email, PhoneNumber, Address));
                 ResetProperties();
             }
             else
@@ -138,9 +159,12 @@ namespace Telefoonboek
                 SelectedItem.Firstname = Firstname;
                 SelectedItem.Email = Email;
                 SelectedItem.PhoneNumber = PhoneNumber;
+                SelectedItem.Address = Address;
+                phoneBookRepository.UpdateItem(SelectedItem);
 
                 SelectedItem = null; // deselecteren van item.
             }
+            PhoneBookItems = phoneBookRepository.GetAllPhoneBookItems();
         }
 
         private void ResetProperties()
@@ -153,7 +177,9 @@ namespace Telefoonboek
 
         private void DeleteCommandAction()
         {
-            PhoneBookItems.Remove(SelectedItem);
+            phoneBookRepository.DeleteItem(SelectedItem);
+            PhoneBookItems = phoneBookRepository.GetAllPhoneBookItems();
+
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -171,7 +197,7 @@ namespace Telefoonboek
 
         private void CheckDeleteButtonAvailablity()
         {
-            DeleteButtonEnabled = SelectedItem != null;    
+            DeleteButtonEnabled = SelectedItem != null;
         }
 
     }

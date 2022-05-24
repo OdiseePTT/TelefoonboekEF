@@ -1,70 +1,82 @@
-﻿    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
-    namespace Telefoonboek
+namespace Telefoonboek
+{
+    internal class PhoneBookItem : INotifyPropertyChanged
     {
-        internal class PhoneBookItem : INotifyPropertyChanged
+        private string lastname;
+        private string firstname;
+        private string email;
+        private string phoneNumber;
+        private string address;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [Key]
+        public int ID { get; set; }
+        public string Lastname
         {
-            private string lastname;
-            private string firstname;
-            private string email;
-            private string phoneNumber;
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            public string Lastname
+            get { return lastname; }
+            set
             {
-                get { return lastname; }
-                set
-                {
-                    lastname = value;
-                    OnPropertyChanged();
-                }
+                lastname = value;
+                OnPropertyChanged();
             }
-            public string Firstname
+        }
+        public string Firstname
+        {
+            get { return firstname; }
+            set
             {
-                get { return firstname; }
-                set
-                {
-                    firstname = value;
-                    OnPropertyChanged();
-                }
+                firstname = value;
+                OnPropertyChanged();
             }
+        }
 
-            public string Email
+        public string Email
+        {
+            get { return email; }
+            set
             {
-                get { return email; }
-                set
-                {
-                    email = value;
-                    OnPropertyChanged();
-                }
+                email = value;
+                OnPropertyChanged();
             }
+        }
 
-            public string PhoneNumber
+        public string PhoneNumber
+        {
+            get { return phoneNumber; }
+            set
             {
-                get { return phoneNumber; }
-                set
-                {
-                    phoneNumber = value;
-                    OnPropertyChanged();
-                }
+                phoneNumber = value;
+                OnPropertyChanged();
             }
+        }
 
-            public PhoneBookItem(string lastname, string firstname, string email, string phoneNumber)
-            {
-                Lastname = lastname;
-                Firstname = firstname;
-                Email = email;
-                PhoneNumber = phoneNumber;
-            }
+        public string Address { get => address; set => address = value; }
 
-            private void OnPropertyChanged([CallerMemberName] string property = null)
+        public PhoneBookItem(string lastname, string firstname, string email, string phoneNumber, string address)
+        {
+            Lastname = lastname;
+            Firstname = firstname;
+            Email = email;
+            PhoneNumber = phoneNumber;
+            Address = address;
+        }
+
+        public PhoneBookItem()
+        {
+
+        }
+
+        private void OnPropertyChanged([CallerMemberName] string property = null)
+        {
+            if (PropertyChanged != null)
             {
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(property));
-                }
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
             }
         }
     }
+}
